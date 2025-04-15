@@ -7,7 +7,13 @@ const socketIo = require('socket.io');
 const path = require('path');
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+// Debug environment variables
+console.log('Environment variables loaded:');
+console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'Set (value hidden)' : 'Not set');
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Set (value hidden)' : 'Not set');
+console.log('PORT:', process.env.PORT);
 
 // Initialize Express app
 const app = express();
@@ -29,17 +35,55 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    return true;
+  } catch (error) {
+    console.error(`Error connecting to MongoDB: ${error.message}`);
+    process.exit(1); // Exit with failure
+  }
+};
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const propertyRoutes = require('./routes/propertyRoutes');
 
 // API Routes
-app.get('/api', (req, res) => {
+app.get('/api', (_req, res) => {
   res.send('Magic Bricks API is running');
+});
+
+// Health check endpoint
+app.get('/api/health', (_req, res) => {
+  // Check MongoDB connection
+  const mongoStatus = mongoose.connection.readyState;
+  const mongoStatusText = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting',
+    99: 'uninitialized'
+  }[mongoStatus] || 'unknown';
+
+  res.json({
+    status: 'ok',
+    timestamp: new Date(),
+    uptime: process.uptime(),
+    mongodb: mongoStatusText,
+    env: process.env.NODE_ENV
+  });
+});
+
+// Global error handler
+app.use((err, _req, res, _next) => {
+  console.error('Global error handler:', err);
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
 // Mount routes
@@ -72,7 +116,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(frontendPath));
 
   // Handle any requests that don't match the ones above
-  app.get('*', (req, res) => {
+  app.get('*', (_req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
@@ -80,7 +124,11 @@ if (process.env.NODE_ENV === 'production') {
 // Note: The old frontend folder inside the backend directory is deprecated and should be ignored
 
 // Start server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const PORT = process.env.PORT || 9999; // Using port 9999 as the standard port
+
+// Connect to database before starting server
+connectDB().then(() => {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });

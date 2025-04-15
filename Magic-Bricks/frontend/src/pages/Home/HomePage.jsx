@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { getProperties } from '../../redux/slices/propertySlice';
+import { getProperties, reset } from '../../redux/slices/propertySlice';
 import PropertyCard from '../../components/property/PropertyCard';
 import SearchBar from '../../components/common/SearchBar';
 
 const HomePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { properties, isLoading } = useSelector((state) => state.property);
+  const { properties, isLoading, error } = useSelector((state) => state.property);
   const [searchParams, setSearchParams] = useState({
     listingType: 'sale',
     city: '',
@@ -17,11 +17,51 @@ const HomePage = () => {
 
   useEffect(() => {
     // Fetch featured properties
-    dispatch(getProperties({ featured: true, limit: 6 }));
+    dispatch(getProperties({ limit: 6 }));
+
+    // Cleanup function to reset state when component unmounts
+    return () => {
+      dispatch(reset());
+    };
   }, [dispatch]);
 
+  // Debug: Log properties when they change
+  useEffect(() => {
+    console.log('Properties loaded:', properties.length, properties);
+  }, [properties]);
+
+  // Handle API errors
+  useEffect(() => {
+    if (error) {
+      console.error('Error fetching properties:', error);
+      // Reset error state after handling
+      dispatch(reset());
+    }
+  }, [error, dispatch]);
+
   const handleSearch = (params) => {
-    navigate('/properties', { state: params });
+    // Convert params to URL search parameters
+    const searchParams = new URLSearchParams();
+
+    // Add all non-empty parameters to URL
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        // Convert boolean values to strings
+        if (typeof value === 'boolean') {
+          searchParams.append(key, value.toString());
+        } else {
+          searchParams.append(key, value);
+        }
+      }
+    });
+
+    console.log('Search params:', Object.fromEntries(searchParams.entries()));
+
+    // Navigate to properties page with search parameters in URL
+    navigate({
+      pathname: '/properties',
+      search: searchParams.toString()
+    });
   };
 
   return (
@@ -35,7 +75,7 @@ const HomePage = () => {
             <p className="text-xl mb-8">
               Search from thousands of properties for sale and rent across India
             </p>
-            
+
             {/* Search Bar */}
             <SearchBar onSearch={handleSearch} initialValues={searchParams} />
           </div>
@@ -56,8 +96,22 @@ const HomePage = () => {
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
             </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <p className="text-red-500 mb-4">Failed to load properties. Please try again later.</p>
+              <button
+                onClick={() => dispatch(getProperties({ limit: 6 }))}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Retry
+              </button>
+            </div>
+          ) : properties.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No properties found.</p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto">
               {properties.map((property) => (
                 <PropertyCard key={property._id} property={property} />
               ))}
@@ -70,7 +124,7 @@ const HomePage = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Why Choose Magic Bricks</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-6 bg-white rounded-lg shadow-md">
               <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -83,7 +137,7 @@ const HomePage = () => {
                 India's most trusted property portal with verified listings and genuine owners.
               </p>
             </div>
-            
+
             <div className="text-center p-6 bg-white rounded-lg shadow-md">
               <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -95,7 +149,7 @@ const HomePage = () => {
                 Browse through thousands of properties across all major cities in India.
               </p>
             </div>
-            
+
             <div className="text-center p-6 bg-white rounded-lg shadow-md">
               <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

@@ -33,7 +33,10 @@ export const getProperties = createAsyncThunk(
         });
       }
 
-      const response = await axios.get(`${API_URL}?${queryParams.toString()}`);
+      // Add timeout to prevent hanging requests
+      const response = await axios.get(`${API_URL}?${queryParams.toString()}`, {
+        timeout: 10000 // 10 seconds timeout
+      });
       return response.data;
     } catch (error) {
       const message = error.response?.data?.message || error.message || 'Something went wrong';

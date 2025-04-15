@@ -29,9 +29,16 @@ api.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized errors
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      console.error('Unauthorized request detected:', error.config.url);
+
+      // Only redirect to login if not already on login page
+      // This prevents redirect loops
+      if (!window.location.pathname.includes('/login')) {
+        console.log('Clearing auth data and redirecting to login...');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

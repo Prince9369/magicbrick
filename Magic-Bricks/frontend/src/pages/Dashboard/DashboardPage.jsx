@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../../redux/slices/authSlice';
 import {
   FaHome,
   FaBuilding,
@@ -9,6 +10,7 @@ import {
   FaUser,
   FaPlus,
   FaChartBar,
+  FaSignOutAlt,
 } from 'react-icons/fa';
 
 // Import dashboard components
@@ -22,16 +24,30 @@ import Conversation from './Conversation';
 
 const DashboardPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { unreadCount } = useSelector((state) => state.chat);
-  
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
+  const handleLogout = () => {
+    console.log('Logging out...');
+    dispatch(logout())
+      .then(() => {
+        console.log('Logout successful');
+        navigate('/');
+      })
+      .catch((error) => {
+        console.error('Logout failed:', error);
+      });
+  };
+
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
-  
+
   // Navigation items
   const navItems = [
     {
@@ -69,12 +85,12 @@ const DashboardPage = () => {
       icon: <FaUser />,
     },
   ];
-  
+
   // Filter nav items based on user role
   const filteredNavItems = navItems.filter(
     (item) => !item.roles || item.roles.includes(user?.role)
   );
-  
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="flex flex-col md:flex-row">
@@ -84,13 +100,13 @@ const DashboardPage = () => {
             <div className="px-4 pb-4 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-800">Dashboard</h2>
             </div>
-            
+
             <nav className="mt-5 flex-1 px-2 space-y-1">
               {filteredNavItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-md ${
+                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
                     location.pathname === item.path
                       ? 'bg-red-50 text-red-600'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
@@ -105,10 +121,19 @@ const DashboardPage = () => {
                   )}
                 </Link>
               ))}
+
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="group flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer text-gray-700 hover:bg-gray-50 hover:text-gray-900 w-full mt-4"
+              >
+                <span className="mr-3 text-lg"><FaSignOutAlt /></span>
+                Logout
+              </button>
             </nav>
           </div>
         </div>
-        
+
         {/* Mobile Header */}
         <div className="md:hidden bg-white shadow-md">
           <div className="flex items-center justify-between px-4 py-3">
@@ -141,7 +166,7 @@ const DashboardPage = () => {
               </svg>
             </button>
           </div>
-          
+
           {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <nav className="px-2 pt-2 pb-4 space-y-1 bg-white">
@@ -149,7 +174,7 @@ const DashboardPage = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-md ${
+                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
                     location.pathname === item.path
                       ? 'bg-red-50 text-red-600'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
@@ -164,10 +189,19 @@ const DashboardPage = () => {
                   )}
                 </Link>
               ))}
+
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="group flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer text-gray-700 hover:bg-gray-50 hover:text-gray-900 w-full mt-4"
+              >
+                <span className="mr-3 text-lg"><FaSignOutAlt /></span>
+                Logout
+              </button>
             </nav>
           )}
         </div>
-        
+
         {/* Main Content */}
         <div className="md:ml-64 flex-1">
           <main className="py-6 px-4 sm:px-6 md:px-8">

@@ -1,19 +1,67 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice';
 import { FaUser, FaSignOutAlt, FaHome, FaBuilding, FaHeart, FaEnvelope } from 'react-icons/fa';
 
-const Header = () => {
+// Memoized profile image component to prevent re-renders
+const ProfileImage = memo(({ user }) => {
+  // Use a placeholder image as fallback
+  const placeholderImage = '/placeholder.png';
+
+  // Memoize the image source to prevent re-renders
+  const imageSrc = useMemo(() => {
+    return user?.profilePicture || user?.profilePic || placeholderImage;
+  }, [user?.profilePicture, user?.profilePic]);
+
+  return (
+    <img
+      src={imageSrc}
+      alt="Profile"
+      className="w-8 h-8 rounded-full object-cover"
+      onError={(e) => {
+        e.target.onerror = null;
+        e.target.src = placeholderImage;
+      }}
+      loading="eager" // Prioritize loading
+      style={{ objectFit: 'cover' }} // Ensure consistent sizing
+    />
+  );
+});
+
+const Header = memo(() => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const { unreadCount } = useSelector((state) => state.chat);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const menuRef = useRef(null);
 
+  // Handle clicks outside the menu to close it
   useEffect(() => {
-    console.log('Header component mounted, auth state:', { isAuthenticated, user });
-  }, [isAuthenticated, user]);
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    // Add event listener when menu is open
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    // Clean up the event listener
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  // Only log on initial mount, not on every auth state change
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Header component mounted');
+    }
+  }, []);
 
   const handleLogout = () => {
     console.log('Logging out...');
@@ -61,53 +109,47 @@ const Header = () => {
           {/* User Menu - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
-              <div className="relative">
+              <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="flex items-center space-x-2 text-gray-700 hover:text-red-600"
                 >
                   <span>{user?.name}</span>
-                  <img
-                    src={user?.profilePicture || user?.profilePic || 'https://via.placeholder.com/40'}
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/40';
-                    }}
-                  />
+                  <ProfileImage user={user} />
                 </button>
                 {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                     <Link
                       to="/dashboard"
-                      className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center"
+                      className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center cursor-pointer"
                     >
                       <FaHome className="mr-2" /> Dashboard
                     </Link>
                     <Link
                       to="/profile"
-                      className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center"
+                      className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center cursor-pointer"
                     >
                       <FaUser className="mr-2" /> Profile
                     </Link>
                     {user?.role === 'seller' && (
                       <Link
                         to="/dashboard/properties"
-                        className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center"
+                        className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center cursor-pointer"
                       >
                         <FaBuilding className="mr-2" /> My Properties
                       </Link>
                     )}
                     <Link
                       to="/dashboard/wishlist"
-                      className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center"
+                      className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center cursor-pointer !z-50 relative"
+                      style={{ pointerEvents: 'auto' }}
                     >
                       <FaHeart className="mr-2" /> Wishlist
                     </Link>
                     <Link
                       to="/dashboard/messages"
-                      className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center"
+                      className="flex px-4 py-2 text-gray-700 hover:bg-gray-100 items-center cursor-pointer !z-50 relative"
+                      style={{ pointerEvents: 'auto' }}
                     >
                       <FaEnvelope className="mr-2" /> Messages
                       {unreadCount > 0 && (
@@ -118,7 +160,8 @@ const Header = () => {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 items-center"
+                      className="flex w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 items-center cursor-pointer !z-50 relative"
+                      style={{ pointerEvents: 'auto' }}
                     >
                       <FaSignOutAlt className="mr-2" /> Logout
                     </button>
@@ -175,7 +218,7 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4">
+          <div className="md:hidden mt-4 pb-4 z-50">
             <nav className="flex flex-col space-y-2">
               <Link
                 to="/"
@@ -217,15 +260,7 @@ const Header = () => {
               {isAuthenticated ? (
                 <>
                   <div className="flex items-center space-x-2 mb-4 py-2 border-b border-gray-200">
-                    <img
-                      src={user?.profilePicture || user?.profilePic || 'https://via.placeholder.com/40'}
-                      alt="Profile"
-                      className="w-8 h-8 rounded-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/40';
-                      }}
-                    />
+                    <ProfileImage user={user} />
                     <span className="font-medium">{user?.name}</span>
                   </div>
                   <Link
@@ -304,6 +339,6 @@ const Header = () => {
       </div>
     </header>
   );
-};
+});
 
 export default Header;

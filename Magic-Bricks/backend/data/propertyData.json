@@ -448,5 +448,195 @@
     "featured": false,
     "verified": true,
     "views": 165
+  },
+  {
+    "title": "Luxury Apartment in Downtown",
+    "description": "Elegant 3BHK apartment located in the heart of the city. Great view and modern interiors.",
+    "price": 120,
+    "priceUnit": "per sq ft",
+    "propertyType": "apartment",
+    "listingType": "rent",
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "furnishing": "semi-furnished",
+    "constructionStatus": "ready to move",
+    "area": 1600,
+    "areaUnit": "sq ft",
+    "location": {
+      "address": "Downtown Area, Mumbai",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400001",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [72.8777, 19.0760]
+      }
+    },
+    "amenities": ["gym", "parking", "power backup", "elevator", "clubhouse", "security", "swimming pool"],
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        "public_id": "magicbricks/properties/downtown1"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
+        "public_id": "magicbricks/properties/downtown2"
+      }
+    ],
+    "featured": true,
+    "verified": true,
+    "views": 412
+  },
+  {
+    "title": "Spacious Independent Villa",
+    "description": "4BHK villa with garden and private parking. Peaceful residential area ideal for families.",
+    "price": 95,
+    "priceUnit": "per sq ft",
+    "propertyType": "villa",
+    "listingType": "sale",
+    "bedrooms": 4,
+    "bathrooms": 3,
+    "furnishing": "fully-furnished",
+    "constructionStatus": "ready to move",
+    "area": 2400,
+    "areaUnit": "sq ft",
+    "location": {
+      "address": "Koramangala, Bangalore",
+      "city": "Bangalore",
+      "state": "Karnataka",
+      "pincode": "560034",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.6146, 12.9340]
+      }
+    },
+    "amenities": ["garden", "parking", "security", "gym", "balcony", "wifi", "modular kitchen"],
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6",
+        "public_id": "magicbricks/properties/villa_spacious1"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
+        "public_id": "magicbricks/properties/villa_spacious2"
+      }
+    ],
+    "featured": false,
+    "verified": true,
+    "views": 278
+  },
+  {
+    "title": "Modern Studio Apartment",
+    "description": "Compact yet stylish studio apartment perfect for young professionals or students.",
+    "price": 60,
+    "priceUnit": "per sq ft",
+    "propertyType": "apartment",
+    "listingType": "rent",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "furnishing": "unfurnished",
+    "constructionStatus": "under construction",
+    "area": 550,
+    "areaUnit": "sq ft",
+    "location": {
+      "address": "Connaught Place, Delhi",
+      "city": "Delhi",
+      "state": "Delhi",
+      "pincode": "110001",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.2090, 28.6139]
+      }
+    },
+    "amenities": ["elevator", "security", "wifi", "balcony", "parking", "power backup", "laundry"],
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1536376072261-38c75010e6c9",
+        "public_id": "magicbricks/properties/studio1"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1560448204-61dc36dc98c8",
+        "public_id": "magicbricks/properties/studio2"
+      }
+    ],
+    "featured": false,
+    "verified": false,
+    "views": 133
+  },
+  {
+    "title": "Furnished PG for Students",
+    "description": "Well-maintained PG accommodation with food and Wi-Fi included. Safe and secure.",
+    "price": 45,
+    "priceUnit": "per sq ft",
+    "propertyType": "apartment",
+    "listingType": "rent",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "furnishing": "fully-furnished",
+    "constructionStatus": "ready to move",
+    "area": 300,
+    "areaUnit": "sq ft",
+    "location": {
+      "address": "Shivaji Nagar, Pune",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411001",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [73.8567, 18.5204]
+      }
+    },
+    "amenities": ["wifi", "meals", "cleaning", "security", "cctv", "laundry", "power backup"],
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        "public_id": "magicbricks/properties/pg1"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
+        "public_id": "magicbricks/properties/pg2"
+      }
+    ],
+    "featured": true,
+    "verified": true,
+    "views": 189
+  },
+  {
+    "title": "Retail Shop in Market Area",
+    "description": "Prime location retail space in high footfall zone. Suitable for garments, groceries, or showrooms.",
+    "price": 150,
+    "priceUnit": "per sq ft",
+    "propertyType": "shop",
+    "listingType": "rent",
+    "bedrooms": 0,
+    "bathrooms": 1,
+    "furnishing": "unfurnished",
+    "constructionStatus": "ready to move",
+    "area": 900,
+    "areaUnit": "sq ft",
+    "location": {
+      "address": "CG Road, Ahmedabad",
+      "city": "Ahmedabad",
+      "state": "Gujarat",
+      "pincode": "380015",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [72.5714, 23.0225]
+      }
+    },
+    "amenities": ["cctv", "parking", "power backup", "storage", "security", "elevator", "signboard"],
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1604014237800-1c9102c219da",
+        "public_id": "magicbricks/properties/shop1"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1604014237800-1c9102c219da",
+        "public_id": "magicbricks/properties/shop2"
+      }
+    ],
+    "featured": false,
+    "verified": true,
+    "views": 362
   }
 ]
